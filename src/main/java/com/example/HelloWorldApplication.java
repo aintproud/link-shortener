@@ -1,20 +1,23 @@
 package com.example;
-
+import org.springframework.http.MediaType;
+import org.springframework.core.io.Resource;
 import org.mindrot.jbcrypt.BCrypt;
-
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.view.RedirectView;
 
 @SpringBootApplication
 public class HelloWorldApplication {
@@ -26,8 +29,30 @@ public class HelloWorldApplication {
 
 @RestController
 class HelloWorldController {
+    private final ResourceLoader resourceLoader;
+
+    public HelloWorldController(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<String> hello() {
+        try {
+            // Load the HTML file from the root of the project
+            Resource resource = resourceLoader.getResource("file:src/main/resources/static/index.html");
+            byte[] fileBytes = FileCopyUtils.copyToByteArray(resource.getInputStream());
+            String fileContent = new String(fileBytes, StandardCharsets.UTF_8);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.TEXT_HTML)
+                    .body(fileContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error loading HTML file");
+        }
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity handleR(@PathVariable String id) {
+    public ResponseEntity<String> handleR(@PathVariable String id) {
         final Jedis redis = RedisService.getClient();
         final String url = redis.get(id);
         if (url == null) {

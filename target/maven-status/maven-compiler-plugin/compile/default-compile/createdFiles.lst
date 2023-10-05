@@ -1,5 +1,6 @@
 com/example/GetIdJson.class
 com/example/HelloWorldController.class
-com/example/RedisService.class
+com/example/IndexHtmlReader.class
 com/example/IdService.class
+com/example/RedisService.class
 com/example/HelloWorldApplication.class
