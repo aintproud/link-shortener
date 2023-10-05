@@ -3,6 +3,7 @@ import org.springframework.http.MediaType;
 import org.springframework.core.io.Resource;
 import org.mindrot.jbcrypt.BCrypt;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -12,18 +13,19 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import io.github.cdimascio.dotenv.Dotenv;
 
 @SpringBootApplication
 public class HelloWorldApplication {
     public static void main(String[] args) {
-        SpringApplication.run(HelloWorldApplication.class, args);
-        RedisService.declareClient();
+        Dotenv dotenv = Dotenv.configure().load();
+        SpringApplication.run(HelloWorldApplication.class);
+        RedisService.declareClient(dotenv.get("REDIS_URL"), Integer.parseInt(dotenv.get("REDIS_PORT")));
     }
 }
 
@@ -61,14 +63,18 @@ class HelloWorldController {
         return ResponseEntity.status(HttpStatus.PERMANENT_REDIRECT).header("Location", url).body(null);
     }
     @PostMapping("/getId")
-    public String servise(@RequestBody final GetIdJson request) {
+    public ResponseEntity<String> servise(@RequestBody final GetIdJson request) {
         final String url = request.getUrl();
-        final String id = IdService.generate(url);
+        try {
+            new URL(url);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        Dotenv dotenv = Dotenv.configure().load();
+        final String id = IdService.generate(url, dotenv.get("BCRYPT_SALT"));
         final Jedis redis = RedisService.getClient();
         redis.set(id, url);
-        final String bar = redis.get(id);
-        System.out.println(bar);
-        return id;
+        return ResponseEntity.status(HttpStatus.OK).body(id);
     }
 }
 
@@ -77,14 +83,13 @@ class RedisService{
     public static Jedis getClient(){
         return resourse;
     }
-    public static void declareClient(){
-        resourse = new JedisPool("localhost", 1000).getResource();
+    public static void declareClient(String host, int port){
+        resourse = new JedisPool(host, port).getResource();
     }
 }
 
 class IdService {
-    public static String generate(String link){
-        String salt = "$2a$10$Tdc1oXEY8UPd87VC4kd8GO";
+    public static String generate(String link, String salt){
         String hash = BCrypt.hashpw(link, salt);
         String id = hash.substring(29, Math.min(hash.length(), 41));
         return id;
@@ -97,3 +102,4 @@ class GetIdJson {
         return url;
     }
 }
+
