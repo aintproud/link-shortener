@@ -7,6 +7,8 @@ import redis.clients.jedis.JedisPool;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,23 +26,14 @@ public class HelloWorldApplication {
 
 @RestController
 class HelloWorldController {
-    @GetMapping()
-    public String mainRoute() {
-        final Jedis redis = RedisService.getClient();
-        redis.set("foo", "bar");
-        final String bar = redis.get("foo");
-        System.out.println(bar);
-        final String id = IdService.generate("null");
-        return id;
-    }
     @GetMapping("/{id}")
-    public RedirectView handleR(@PathVariable String id) {
+    public ResponseEntity handleR(@PathVariable String id) {
         final Jedis redis = RedisService.getClient();
         final String url = redis.get(id);
-        RedirectView redirectView = new RedirectView();
-        redirectView.setUrl(url);
-        return redirectView;
-
+        if (url == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.PERMANENT_REDIRECT).header("Location", url).body(null);
     }
     @PostMapping("/getId")
     public String servise(@RequestBody final GetIdJson request) {
