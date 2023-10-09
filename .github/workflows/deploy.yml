@@ -1,7 +1,8 @@
 name: Deploy buy runner
 on:
   push:
-    branches: "main"
+    branches: 
+     - main
 jobs:
   prepare-environment:
     runs-on: self-hosted # Запускаем на раннере, который настроили до этого.
