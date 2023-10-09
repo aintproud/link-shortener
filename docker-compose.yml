@@ -9,11 +9,11 @@ services:
     volumes:
       - ./redis/data:/data
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
-    back:
-      depends_on: 
-        - redis
-      build: .
-      image: example
-      container_name: example
-      ports:
-        - "8080:8080"
+  back:
+    depends_on: 
+      - redis
+    build: .
+    image: example
+    container_name: example
+    ports:
+      - "8080:8080"
