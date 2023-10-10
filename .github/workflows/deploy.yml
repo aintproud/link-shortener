@@ -5,7 +5,7 @@ on:
      - main
 jobs:
   prepare-environment:
-  timeout-minutes: 5
+    timeout-minutes: 5
     runs-on: self-hosted # Запускаем на раннере, который настроили до этого.
     steps:
       - name: cd into repo # Название шага
@@ -24,7 +24,7 @@ jobs:
         run: sudo docker system prune -a -f
   
   deploy:
-  timeout-minutes: 5
+    timeout-minutes: 5
     runs-on: self-hosted # Запускаем на раннере, который настроили до этого.
     needs: prepare-environment # Запускаем только если джоба prepare-environment прошла успешно
     steps:
