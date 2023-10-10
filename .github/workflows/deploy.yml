@@ -5,6 +5,7 @@ on:
      - main
 jobs:
   prepare-environment:
+  timeout-minutes: 5
     runs-on: self-hosted # Запускаем на раннере, который настроили до этого.
     steps:
       - name: cd into repo # Название шага
@@ -14,7 +15,7 @@ jobs:
       - name: set up Java and Maven # Настраиваем Java и Maven.
         uses: actions/setup-java@v3 
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'temurin'
           cache: maven
       - name: Stop and remove containers, networks
@@ -23,6 +24,7 @@ jobs:
         run: sudo docker system prune -a -f
   
   deploy:
+  timeout-minutes: 5
     runs-on: self-hosted # Запускаем на раннере, который настроили до этого.
     needs: prepare-environment # Запускаем только если джоба prepare-environment прошла успешно
     steps:
