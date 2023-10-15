@@ -1,0 +1,34 @@
+name: Deploy buy runner
+on:
+  push:
+    branches: 
+     - main
+jobs:
+  prepare-environment:
+    timeout-minutes: 5
+    runs-on: self-hosted # Запускаем на раннере, который настроили до этого.
+    steps:
+      - name: cd into repo # Название шага
+        uses: actions/checkout@v3 # Ключевое слово uses используется для запуска заранее
+# созданного набора команд. В данном случае используем дефолтную команду
+# для обновления проекта до последнего коммита.
+      - name: set up Java and Maven # Настраиваем Java и Maven.
+        uses: actions/setup-java@v3 
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Stop and remove containers, networks
+        run: sudo docker-compose down
+      - name: Remove unused data
+        run: sudo docker system prune -a -f
+  
+  deploy:
+    timeout-minutes: 5
+    runs-on: self-hosted # Запускаем на раннере, который настроили до этого.
+    needs: prepare-environment # Запускаем только если джоба prepare-environment прошла успешно
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v3
+      - name: docker-compose
+        run: sudo docker-compose up -d
