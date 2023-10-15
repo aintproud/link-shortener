@@ -7,7 +7,7 @@ services:
       - '1000:1000'
     command: redis-server /usr/local/etc/redis/redis.conf
     volumes:
-      - ./redis/data:/data
+      - redis:/data
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
   back:
     depends_on: 
@@ -17,3 +17,7 @@ services:
     container_name: example
     ports:
       - "8080:8080"
+    environment:
+      - REDIS_URL=redis://redis:1000
+volumes:
+  redis:
