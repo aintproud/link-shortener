@@ -25,7 +25,7 @@ public class HelloWorldApplication {
     public static void main(String[] args) {
         Dotenv dotenv = Dotenv.configure().load();
         SpringApplication.run(HelloWorldApplication.class);
-        RedisService.declareClient(dotenv.get("REDIS_URL"), Integer.parseInt(dotenv.get("REDIS_PORT")));
+        RedisService.declareClient(System.getenv("REDIS_URL"));
     }
 }
 
@@ -83,8 +83,8 @@ class RedisService{
     public static Jedis getClient(){
         return resourse;
     }
-    public static void declareClient(String host, int port){
-        resourse = new JedisPool(host, port).getResource();
+    public static void declareClient(String url){
+        resourse = new JedisPool(url).getResource();
     }
 }
 
