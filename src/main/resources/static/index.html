@@ -125,7 +125,7 @@
                 });
                 const shortUrl = await res.text();
                 if (shortUrl) {
-                    shortenedLink.innerHTML = `<a href="http://45.153.68.103:8080/${shortUrl}">http://localhost:8080/${shortUrl}</a>`;
+                    shortenedLink.innerHTML = `<a href="http://45.153.68.103:8080/${shortUrl}">http://45.153.68.103:8080/${shortUrl}</a>`;
                     linkForm.style.display = 'block';
                 }
             }
