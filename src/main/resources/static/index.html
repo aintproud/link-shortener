@@ -115,19 +115,15 @@
                 errorMessage.style.display = 'block';
                 linkForm.style.display = 'none';
             } else {
-                console.log(searchInputValue);
-                console.log(JSON.stringify({ url: searchInputValue }));
                 errorMessage.style.display = 'none';
-                const res = await fetch('http://45.153.68.103:8080/getId', { 
+                const res = await fetch('http://localhost:8080/getId', { 
                     method: 'POST',
-                    mode: "no-cors",
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ url: searchInputValue })
                 });
-                const { shortUrl } = await res.json();
-                console.log(shortUrl);
+                const shortUrl = await res.text();
                 if (shortUrl) {
                     shortenedLink.textContent = shortUrl;
                     linkForm.style.display = 'block';
