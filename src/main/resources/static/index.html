@@ -116,7 +116,7 @@
                 linkForm.style.display = 'none';
             } else {
                 errorMessage.style.display = 'none';
-                const res = await fetch('http://45.153.68.103:8080/getId', { 
+                const res = await fetch('http://45.153.69.182:8080/getId', { 
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -125,7 +125,7 @@
                 });
                 const shortUrl = await res.text();
                 if (shortUrl) {
-                    shortenedLink.innerHTML = `<a href="http://45.153.68.103:8080/${shortUrl}">http://45.153.68.103:8080/${shortUrl}</a>`;
+                    shortenedLink.innerHTML = `<a href="http://45.153.69.182:8080/${shortUrl}">http://45.153.69.182:8080/${shortUrl}</a>`;
                     linkForm.style.display = 'block';
                 }
             }
